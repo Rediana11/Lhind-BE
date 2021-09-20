@@ -2,7 +2,6 @@ package com.lhind.project.annualleave.entity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Table(name = "person")
 @Entity

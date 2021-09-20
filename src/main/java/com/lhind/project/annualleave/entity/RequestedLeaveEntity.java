@@ -2,7 +2,6 @@ package com.lhind.project.annualleave.entity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name = "requested_leave")
@@ -15,7 +14,7 @@ public class RequestedLeaveEntity {
     @Column(name = "requested_leave_days")
     private int requestedLeaveDays;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "leave_id")
     private LeaveInfoEntity leave;
 

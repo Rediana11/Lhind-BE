@@ -1,16 +1,13 @@
 package com.lhind.project.annualleave.service.impl;
 
-import com.lhind.project.annualleave.dto.LeaveStatusDTO;
+import com.lhind.project.annualleave.dto.AddUpdateRequestedLeaveDTO;
 import com.lhind.project.annualleave.dto.RequestedLeaveDTO;
 import com.lhind.project.annualleave.entity.LeaveInfoEntity;
 import com.lhind.project.annualleave.entity.LeaveStatusEntity;
 import com.lhind.project.annualleave.entity.PersonEntity;
 import com.lhind.project.annualleave.entity.RequestedLeaveEntity;
 import com.lhind.project.annualleave.exception.EntityNotFoundException;
-import com.lhind.project.annualleave.mapper.LeaveMapper;
-import com.lhind.project.annualleave.mapper.LeaveStatusMapper;
-import com.lhind.project.annualleave.mapper.PersonMapper;
-import com.lhind.project.annualleave.mapper.RequestedLeaveMapper;
+import com.lhind.project.annualleave.mapper.*;
 import com.lhind.project.annualleave.repository.LeaveInfoRepository;
 import com.lhind.project.annualleave.repository.LeaveStatusRepository;
 import com.lhind.project.annualleave.repository.PersonRepository;
@@ -27,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +41,9 @@ public class RequestedLeaveServiceImpl implements RequestedLeaveService {
     private UserService userService;
 
     private PersonEntity personEntity;
+
+    private AddUpdateLeaveMapper addUpdateMapper
+            = Mappers.getMapper(AddUpdateLeaveMapper.class);
 
     private RequestedLeaveHelperMapper helperMapper;
 
@@ -103,26 +102,22 @@ public class RequestedLeaveServiceImpl implements RequestedLeaveService {
             throw new EntityNotFoundException("Not valid Id: " + leaveDTO.getId());
         }
     }
-
-    public RequestedLeaveDTO applyForLeave(RequestedLeaveDTO leaveDTO) {
-
-        RequestedLeaveEntity application = new RequestedLeaveEntity();
+    public RequestedLeaveDTO applyForLeave(AddUpdateRequestedLeaveDTO leaveDTO) {
+        LeaveStatusEntity statusEntity = leaveStatusRepository.findByCode("P");
         //if (hasAvailableLeaveDays(leaveDTO) && areDatesValid(leaveDTO)) {
         // if (hasPassedProbationPeriod(leaveDTO)) {
         LeaveInfoEntity leaveInfoEntity = leaveInfoRepository.findByPersonId(this.personEntity.getId());
-        leaveDTO.setRequestedLeaveDays(findRequestedDays(leaveDTO.getDateFrom(), leaveDTO.getDateTo()));
-        logger.info(this.personEntity.toString());
-        leaveDTO.setLeave(leaveMapper.toDto(leaveInfoEntity));
-        leaveDTO.getLeave().setPerson(personMapper.toDto(this.personEntity));
-        leaveDTO.setCreatedOn(LocalDate.now());
-        leaveDTO.setDeleted(false);
-        leaveDTO.setRequestedLeaveDays(findRequestedDays(leaveDTO.getDateFrom(), leaveDTO.getDateTo()));
-        setPendingStatus(leaveDTO);
-        application = leaveRepository.save(mapper.toEntity(leaveDTO));
-
+        RequestedLeaveEntity requestedLeaveEntity = addUpdateMapper.toEntity(leaveDTO);
+        requestedLeaveEntity.setLeave(leaveInfoEntity);
+        requestedLeaveEntity.getLeave().setPerson(this.personEntity);
+        requestedLeaveEntity.setCreatedOn(LocalDate.now());
+        requestedLeaveEntity.setRequestedLeaveDays(findRequestedDays(leaveDTO.getDateFrom(), leaveDTO.getDateTo()));
+        requestedLeaveEntity.setLeaveStatus(statusEntity);
+        RequestedLeaveEntity newLeave = new RequestedLeaveEntity();
+        newLeave = leaveRepository.save(requestedLeaveEntity);
         //}
         // }
-        return mapper.toDto(application);
+        return mapper.toDto(newLeave);
     }
 
     private boolean areDatesValid(RequestedLeaveDTO leaveDTO) {
@@ -139,8 +134,7 @@ public class RequestedLeaveServiceImpl implements RequestedLeaveService {
 
     private void setPendingStatus(RequestedLeaveDTO leaveDTO) {
         LeaveStatusEntity statusEntity = leaveStatusRepository.findByCode("P");
-        LeaveStatusDTO statusDTO = statusMapper.toDto(statusEntity);
-        leaveDTO.setLeaveStatus(statusDTO);
+        mapper.toEntity(leaveDTO).setLeaveStatus(statusEntity);
     }
 
     private boolean hasAvailableLeaveDays(RequestedLeaveDTO leaveDTO) {

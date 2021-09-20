@@ -1,12 +1,12 @@
 package com.lhind.project.annualleave.controller;
 
+import com.lhind.project.annualleave.dto.AddUpdateRequestedLeaveDTO;
 import com.lhind.project.annualleave.dto.RequestedLeaveDTO;
 import com.lhind.project.annualleave.service.RequestedLeaveService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -53,7 +53,7 @@ public class RequestedLeaveController {
     }
 
     @PostMapping
-    public ResponseEntity<RequestedLeaveDTO> applyForLeave(@RequestBody RequestedLeaveDTO leaveDTO) {
+    public ResponseEntity<RequestedLeaveDTO> applyForLeave(@RequestBody AddUpdateRequestedLeaveDTO leaveDTO) {
         RequestedLeaveDTO applicationLeave = leaveService.applyForLeave(leaveDTO);
         return ResponseEntity.ok().body(applicationLeave);
     }

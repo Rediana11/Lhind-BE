@@ -40,7 +40,6 @@ public class RequestedLeaveRepositoryCustomImpl implements RequestedLeaveReposit
             to = LocalDate.parse(dateTo, formatter);
         }
         query += " ORDER BY r.dateFrom";
-
         TypedQuery<RequestedLeaveEntity> typedQuery = entityManager.createQuery(query,
                 RequestedLeaveEntity.class);
         typedQuery.setParameter(1, username);

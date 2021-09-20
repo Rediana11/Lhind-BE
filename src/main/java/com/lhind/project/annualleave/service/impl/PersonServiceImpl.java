@@ -1,10 +1,10 @@
 package com.lhind.project.annualleave.service.impl;
 
+import com.lhind.project.annualleave.dto.AddUpdatePersonDTO;
 import com.lhind.project.annualleave.dto.PersonDTO;
 import com.lhind.project.annualleave.entity.PersonEntity;
-import com.lhind.project.annualleave.entity.RequestedLeaveEntity;
-import com.lhind.project.annualleave.entity.RoleEntity;
 import com.lhind.project.annualleave.exception.EntityNotFoundException;
+import com.lhind.project.annualleave.mapper.AddUpdatePersonMapper;
 import com.lhind.project.annualleave.mapper.PersonMapper;
 import com.lhind.project.annualleave.mapper.RoleMapper;
 import com.lhind.project.annualleave.repository.PersonRepository;
@@ -22,9 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 public class PersonServiceImpl implements PersonService {
@@ -37,6 +35,9 @@ public class PersonServiceImpl implements PersonService {
 
     private UserService userService;
 
+    private AddUpdatePersonMapper addUpdateMapper
+            = Mappers.getMapper(AddUpdatePersonMapper.class);
+
     private PersonMapper mapper
             = Mappers.getMapper(PersonMapper.class);
     public static Logger logger = LoggerFactory.getLogger(PersonServiceImpl.class);
@@ -45,7 +46,7 @@ public class PersonServiceImpl implements PersonService {
             = Mappers.getMapper(RoleMapper.class);
 
     @Autowired
-   private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     public PersonServiceImpl(PersonRepository personRepository, RoleRepository roleRepository, PersonHelperMapper helperMapper, UserService userService) {
         this.personRepository = personRepository;
@@ -65,40 +66,38 @@ public class PersonServiceImpl implements PersonService {
         return mapper.toDto(user.orElseThrow(() -> new EntityNotFoundException("Not valid Id: " + id)));
     }
 
-    public PersonDTO updatePerson(PersonDTO user) {
+    public PersonDTO updatePerson(AddUpdatePersonDTO user) {
         if (personRepository.existsById(user.getId())) {
-            Optional<PersonEntity> model=personRepository.findById(user.getId());
-            user.setCreatedOn(model.get().getCreatedOn());
-            user.setRole(roleMapper.toDto(model.get().getRole()));
-            logger.info(model.get().toString()+ "passss");
-            String password=model.get().getPassword();
-            user.setPassword(password);
-            user.setUsername(model.get().getUsername());
-            user.setUpdatedOn(LocalDate.now());
-            PersonEntity updatedUser = personRepository.save(mapper.toEntity(user));
-            return mapper.toDto(updatedUser);
+            Optional<PersonEntity> model = personRepository.findById(user.getId());
+            PersonEntity personEntity = model.get();
+            personEntity.setUpdatedOn(LocalDate.now());
+            personEntity = personRepository.save(addUpdateMapper.toEntity(user));
+
+            return mapper.toDto(personEntity);
         }
 
         throw new EntityNotFoundException("Not valid Id: " + user.getId());
     }
 
 
-    public PersonDTO createUser(PersonDTO person) {
-        person.setCreatedOn(LocalDate.now());
+    public PersonDTO createUser(AddUpdatePersonDTO person) {
         person.setPassword(passwordEncoder.encode(person.getPassword()));
-        person.setDeleted(false);
-        PersonEntity personEntity = personRepository.save(mapper.toEntity(person));
+        PersonEntity personEntity = personRepository.save(addUpdateMapper.toEntity(person));
         return mapper.toDto(personEntity);
     }
 
-    public void changeUserPassword(String oldPassword, String newPassword, String confirmPassword) {
+    public boolean changeUserPassword(String oldPassword, String newPassword, String confirmPassword) {
+        logger.info("inside changeUserPassword");
         PersonEntity personEntity = personRepository.findPersonByUsername(userService.getUserDetails().getUsername());
+        logger.info(personEntity.getUsername());
         boolean isPasswordMatch = passwordEncoder.matches(oldPassword, personEntity.getPassword());
-        if(isPasswordMatch && newPassword.equals(confirmPassword)) {
-            personEntity.setPassword(newPassword);
+        if (isPasswordMatch && newPassword.equals(confirmPassword)) {
+            personEntity.setPassword(passwordEncoder.encode(newPassword));
             personEntity.setUpdatedOn(LocalDate.now());
             personRepository.save(personEntity);
+            return true;
         }
+        return false;
     }
 
     public void deleteUserById(Long id) {

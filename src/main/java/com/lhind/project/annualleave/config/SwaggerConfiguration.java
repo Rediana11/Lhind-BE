@@ -28,7 +28,6 @@ public class SwaggerConfiguration {
 
     @Bean
     public Docket api() {
-        //@formatter:off
         List<SecurityContext> securityContexts = Arrays.asList(
                 SecurityContext.builder().securityReferences(Arrays.asList((getSwaggerSecurityReference()))).build());
 
@@ -40,16 +39,13 @@ public class SwaggerConfiguration {
                 .securitySchemes(getApiKey())
                 .securityContexts(securityContexts)
                 .apiInfo(getApiInfo());
-        //@formatter:on
     }
 
     private SecurityReference getSwaggerSecurityReference() {
-        //@formatter:off
         return SecurityReference.builder()
                 .reference(HttpHeaders.AUTHORIZATION)
                 .scopes(new AuthorizationScope[] {
                         new AuthorizationScopeBuilder().scope("global").description("Full access").build() }).build();
-        //@formatter:on
     }
 
     private List<SecurityScheme> getApiKey() {

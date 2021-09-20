@@ -2,7 +2,6 @@ package com.lhind.project.annualleave.entity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name = "leave")
@@ -12,7 +11,7 @@ public class LeaveInfoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     private PersonEntity person;
 

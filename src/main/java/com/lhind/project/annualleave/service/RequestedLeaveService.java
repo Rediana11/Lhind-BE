@@ -1,9 +1,9 @@
 package com.lhind.project.annualleave.service;
 
+import com.lhind.project.annualleave.dto.AddUpdateRequestedLeaveDTO;
 import com.lhind.project.annualleave.dto.RequestedLeaveDTO;
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface RequestedLeaveService {
@@ -16,7 +16,7 @@ public interface RequestedLeaveService {
 
     RequestedLeaveDTO updateRequestedLeave(RequestedLeaveDTO leaveDTO);
 
-    RequestedLeaveDTO applyForLeave(RequestedLeaveDTO leaveDTO);
+    RequestedLeaveDTO applyForLeave(AddUpdateRequestedLeaveDTO leaveDTO);
 
     void approveOrRejectApplication(Long requestedLeaveId, boolean value);
 

@@ -1,5 +1,6 @@
 package com.lhind.project.annualleave.service;
 
+import com.lhind.project.annualleave.dto.AddUpdatePersonDTO;
 import com.lhind.project.annualleave.dto.PersonDTO;
 import org.springframework.data.domain.Page;
 
@@ -9,11 +10,11 @@ public interface PersonService {
 
     PersonDTO getUserById(Long id);
 
-    PersonDTO updatePerson(PersonDTO user);
+    PersonDTO updatePerson(AddUpdatePersonDTO user);
 
-    PersonDTO createUser(PersonDTO user);
+    PersonDTO createUser(AddUpdatePersonDTO user);
 
-    void changeUserPassword(String oldPassword, String newPassword, String confirmPassword);
+    boolean changeUserPassword(String oldPassword, String newPassword, String confirmPassword);
 
     void deleteUserById(Long id);
 

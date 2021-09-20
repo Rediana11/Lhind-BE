@@ -1,7 +1,6 @@
 package com.lhind.project.annualleave.dto;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class LeaveInfoDTO {
 

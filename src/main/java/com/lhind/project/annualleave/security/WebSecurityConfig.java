@@ -1,8 +1,8 @@
 package com.lhind.project.annualleave.security;
 
-import com.lhind.project.annualleave.security.model.SecurityUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,21 +10,16 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -69,7 +64,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html",
                         "swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config",
                         "/swagger-resources/**",
-                        "/v3/api-docs/**"
+                        "/v3/api-docs/**",
+                        "/api/user/change-password"
+
 
                 );
     }
@@ -95,30 +92,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/application/leave/request")
                 .hasAuthority("SUPERVISOR")
+                .antMatchers("/api/user/change-password")
+                .hasAuthority("SUPERVISOR")
                 .antMatchers("/api/application/leave/pending-list")
                 .hasAuthority("SUPERVISOR")
                 .antMatchers("/api/user/**")
                 .hasAuthority("ADMIN")
-                .antMatchers("/api/leave")
+                .antMatchers("/api/user/change-password")
+                .hasAuthority("ADMIN")
+                .antMatchers("/api/application/leave")
                 .hasAuthority("USER")
                 .antMatchers("/api/application/leave/list")
                 .hasAuthority("USER")
+                .antMatchers("/api/user/change-password")
+                .hasAuthority("USER")
                 .antMatchers("/api/application/leave/{id}")
                 .hasAuthority("USER")
-                .and()
-                .logout().logoutSuccessHandler(new SimpleUrlLogoutSuccessHandler() {
-                    @Override
-                    public void onLogoutSuccess(HttpServletRequest httpServletRequest,
-                                                HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-                        SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
-                        String username = userDetails.getUsername();
-                        httpServletResponse.sendRedirect(httpServletRequest.getContextPath());
-                        //UrlPathHelper helper = new UrlPathHelper();
-                        //String context=helper.getContextPath(httpServletRequest);
-                        //httpServletResponse.sendRedirect("/api/user/login");
-                    }
-                }).logoutUrl("/auth/login")
-                .invalidateHttpSession(true)
                 .and()
                 .apply(securityConfigurerAdapter());
     }

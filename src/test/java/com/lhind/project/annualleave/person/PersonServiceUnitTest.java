@@ -1,5 +1,6 @@
 package com.lhind.project.annualleave.person;
 
+import com.lhind.project.annualleave.dto.AddUpdatePersonDTO;
 import com.lhind.project.annualleave.dto.PersonDTO;
 import com.lhind.project.annualleave.entity.PersonEntity;
 import com.lhind.project.annualleave.mapper.PersonMapper;
@@ -82,7 +83,7 @@ public class PersonServiceUnitTest {
         Long id = 1L;
         String firstName = "Redi";
 
-        PersonDTO updateDto = new PersonDTO();
+        AddUpdatePersonDTO updateDto = new AddUpdatePersonDTO();
         updateDto.setId(id);
         updateDto.setFirstName(firstName);
 

@@ -1,5 +1,6 @@
 package com.lhind.project.annualleave.controller;
 
+import com.lhind.project.annualleave.dto.AddUpdatePersonDTO;
 import com.lhind.project.annualleave.dto.AuthDTO;
 import com.lhind.project.annualleave.dto.PersonDTO;
 import com.lhind.project.annualleave.service.PersonService;
@@ -34,8 +35,8 @@ public class PersonController {
     @PostMapping("/login")
     public ResponseEntity<UserDetails> createAuthenticationToken(@RequestBody AuthDTO authDTO) throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION,"Bearer " + authService.authenticate(authDTO));
-        return new ResponseEntity<>(userService.loadUserByUsername(authDTO.getUsername()),headers, HttpStatus.OK);
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + authService.authenticate(authDTO));
+        return new ResponseEntity<>(userService.loadUserByUsername(authDTO.getUsername()), headers, HttpStatus.OK);
     }
 
     @GetMapping("/list")
@@ -52,24 +53,22 @@ public class PersonController {
     }
 
     @PostMapping
-    public ResponseEntity<PersonDTO> createUser(@Valid @RequestBody PersonDTO personDTO) {
+    public ResponseEntity<PersonDTO> createUser(@Valid @RequestBody AddUpdatePersonDTO personDTO) {
         PersonDTO personCreated = personService.createUser(personDTO);
         return ResponseEntity.ok().body(personCreated);
     }
 
     @PutMapping
-    public ResponseEntity<PersonDTO> updateUser(@RequestBody PersonDTO personDTO) {
+    public ResponseEntity<PersonDTO> updateUser(@RequestBody AddUpdatePersonDTO personDTO) {
         PersonDTO personUpdated = personService.updatePerson(personDTO);
         return ResponseEntity.ok().body(personUpdated);
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<Void> changePassword(@RequestParam String oldPassword,@RequestParam String newPassword,@RequestParam String confirmPassword) {
-        personService.changeUserPassword(oldPassword,newPassword,confirmPassword);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> changePassword(@RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam String confirmPassword) {
+        boolean isPasswordChanged = personService.changeUserPassword(oldPassword, newPassword, confirmPassword);
+        return ResponseEntity.ok().body(isPasswordChanged);
     }
-
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserById(@PathVariable("id") Long id) {

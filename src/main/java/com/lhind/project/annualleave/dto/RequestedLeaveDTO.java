@@ -1,11 +1,7 @@
 package com.lhind.project.annualleave.dto;
 
 
-import com.lhind.project.annualleave.entity.LeaveInfoEntity;
-
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.util.Date;
 
 public class RequestedLeaveDTO {
 
@@ -13,17 +9,14 @@ public class RequestedLeaveDTO {
 
     private int requestedLeaveDays;
 
-    @NotBlank(message = "Leave type is mandatory")
     private LeaveTypeDTO leaveType;
 
     private LeaveStatusDTO leaveStatus;
 
     private LeaveInfoDTO leave;
 
-    @NotBlank(message = "Start leave day is mandatory")
     private LocalDate dateFrom;
 
-    @NotBlank(message = "Last leave day is mandatory")
     private LocalDate dateTo;
 
     private String note;
